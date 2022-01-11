@@ -44,13 +44,36 @@ function checkEmail(email) {
   let verify = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return verify.test(email);
 }
-// Function qui vérifie date de naissance
-// function checkDate(date) {
-//   let verify = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/;
-//   return verify.test(date);
+// function checkDate(birthdate) {
+//   // La méthode Date.now() renvoie le nombre de millisecondes écoulées depuis le 1er Janvier 1970
+//   let now = Date.now();
+//   // On récupère la valeur de l'input date ici
+//   let date = new Date(birthdate);
+//   let ONE_YEAR_IN_MILLISECONDS = 315360000000000;
+//   let age = (now - date) / ONE_YEAR_IN_MILLISECONDS;
+//   let minimumAge = 13;
+//   if (!(date instanceof Date) || isNaN(date)) {
+//     return false;
+//   }
+//   return age >= minimumAge;
+//   // Ne pas oublier de créer une variable miminimum age
 // }
-// console.log(checkDate(01 / 02 / 1990));
-
+function checkDate(birthdate) {
+  let ageMinimum = 18;
+  let oneYearInMilliseconds = 31557600000;
+  let now = new Date();
+  let age = new Date(birthdate);
+  let difference = (now - age) / oneYearInMilliseconds;
+  console.log("difference", difference)
+  console.log("age", age);
+  console.log("now1", now.getTime());
+  console.log("now", now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+  if (difference < ageMinimum) {
+    return false
+  }
+  return age >= ageMinimum;
+}
+console.log(checkDate())
 // Function qui vérifie qu'une valeur numérique est saisie
 function checkNumber(number) {
   if (isNaN(number)) {
@@ -81,6 +104,7 @@ function displayMessage(element, message) {
   msg.innerHTML = message;
   element.after(msg);
 }
+// 
 // function qui efface les erreurs
 function resetErrors() {
   let errors = document.querySelectorAll('.error_msg')
@@ -89,10 +113,41 @@ function resetErrors() {
 }
 function validate(element, message) {
   displayMessage(element, message)
-  setTimeout(() => {
-    addEventListener('click');
-  }, 2000);
 };
+function noneModal() {
+  modalbg.style.display = "none";
+  let div = document.createElement("div")
+  div.style.display = "block";
+  div.style.position = "fixed";
+  div.style.left = "370px";
+  div.style.right = "0";
+  div.style.zIndex = "3"
+  div.style.width = "500px";
+  div.style.height = "auto";
+  div.style.margin = "15px auto";
+  div.style.padding = "10px";
+  div.style.borderRadius = "10px";
+  div.style.backgroundColor = "#fe142f";
+  div.classList.add("form_msg");
+  div.innerHTML = "Merci ! Votre demande de réservation a bien été envoyée.";
+  div.style.color = "white";
+  div.style.fontSize = "18px";
+  div.style.textAlign = "center";
+  document.querySelector(".hero-section").before(div);
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
+
+
+  // let msg = document.createElement('p');
+  // msg.style.color = "red";
+  // msg.style.fontSize = "15px";
+  // msg.classList.add('error_msg');
+  // msg.innerHTML = message;
+  // element.after(msg);
+}
+
+
 // Event
 // Je récupère via une variable mon élément ".close" et y ajoute l'événement "click" qui applique la fonction "closeModal"
 closeForm.addEventListener('click', function () {
@@ -113,6 +168,7 @@ btnSubmit.addEventListener('click', function (e) {
   let validEmail = email.value;
   let validBirthDate = birthDate.value;
   let validQuantity = quantity.value;
+  e.preventDefault();
   resetErrors();
   // vérifie que la case condition d'utilisation est cochée
   if (checkBtnRadio(generalCondition)) {
@@ -134,12 +190,12 @@ btnSubmit.addEventListener('click', function (e) {
     displayMessage(quantity, "⇧ Veuillez renseigner un nombre de tournois participés valide");
     console.log("Veuillez renseigner un nombre de tournois participés valide");
   }
-  // if (checkDate(validBirthDate)) {
-  //   console.log("Date de naissance OK !");
-  // } else {
-  //   displayMessage(birthDate, "⇧ Veuillez renseigner une date de naissance valide")
-  //   console.log("Veuillez renseigner une date de naissance valide");
-  // }
+  if (checkDate(validBirthDate)) {
+    console.log("Date de naissance OK !");
+  } else {
+    displayMessage(birthDate, "⇧ Veuillez renseigner une date de naissance valide")
+    console.log("Veuillez renseigner une date de naissance valide");
+  }
   if (checkEmail(validEmail)) {
     console.log("Email OK !");
   } else {
@@ -158,11 +214,10 @@ btnSubmit.addEventListener('click', function (e) {
     displayMessage(firstName, "⇧ Veuillez renseigner Prénom avec un minimum de deux lettres (pas de chiffres)");
     console.log("Veuillez renseigner Prénom avec un minimum de deux lettres (pas de chiffres)");
   }
-  if (checkName(validFirstName) && checkName(validLastName) && checkEmail(validEmail) && checkNumber(validQuantity) && checkBtnRadio(location) && checkBtnRadio(generalCondition)) {
-    window.location.reload();
+  if (checkName(validFirstName) && checkName(validLastName) && checkEmail(validEmail) && checkDate(validBirthDate) && checkNumber(validQuantity) && checkBtnRadio(location) && checkBtnRadio(generalCondition)) {
     validate(containerCondition, "Merci ! Votre réservation a été reçue.");
+    noneModal();
   } else {
-    e.preventDefault();
     console.log("Vous n'avez pas remplis toutes les informations");
   }
 });
