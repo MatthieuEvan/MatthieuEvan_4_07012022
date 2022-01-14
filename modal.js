@@ -7,16 +7,16 @@ function editNav() {
   }
 }
 // DOM Elements
+// Récupère les élements dans le DOM
 const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
 const formData = document.querySelectorAll(".formData");
-// Je récupère mon élément ".close"
 let closeForm = document.querySelector(".close");
 let btnSubmit = document.querySelector(".btn-submit");
-// launch modal event
+// Launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 // Function
-// launch modal form
+// Launch modal form
 function launchModal() {
   modalbg.style.display = "block";
 };
@@ -24,60 +24,72 @@ function launchModal() {
 function closeModal() {
   modalbg.style.display = "None";
 };
+// Function qui affiche une erreur
+function displayMessage(element, message) {
+  // Document.createElement est une méthode permettant de créer un élément HTML
+  let msg = document.createElement('p');
+  // .style permet de modifier le style d'un élément
+  msg.style.color = "red";
+  msg.style.fontSize = "15px";
+  // .classList permet d'ajouter une  class à l'élément créé
+  msg.classList.add('error_msg');
+  msg.innerHTML = message;
+  // .after indique la position de l'élement
+  element.after(msg);
+}
+// Affiche un message quand validate() est appelée 
+function validate(element, message) {
+  displayMessage(element, message)
+};
 
 //Function qui vérifie l'utilisation de 2 caractères minimums
 function checkName(name) {
-  // typeof me permet de vérifier que la valeur de mon paramètre est une chaine de caractères
+  // Typeof me permet de vérifier que la valeur de mon paramètre est une chaine de caractères
   if (typeof (name) != "string") {
-    // si ce n'est pas une chaine de caractère, il me retourne false
+    // Si ce n'est pas une chaine de caractère, il me retourne false
     return false
   }
   if (name.length < 2) {
-    // si il y'a moins de 2 caractères, il me retourne false
+    // Si il y'a moins de 2 caractères, il me retourne false
     return false
   }
-  // sinon il me retourne true
+  // Sinon il me retourne true
   return true
 }
-//Function qui vérifie que l'adresse mail est valide
+// Function qui vérifie que l'adresse mail est valide
 function checkEmail(email) {
+  // Utilisation d'une Regex (expression rationnelle) pour valider le format email
   let verify = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  // La méthode test() vérifie s'il y a une correspondance entre un texte et une expression rationnelle. Elle retourne true en cas de succès et false dans le cas contraire
   return verify.test(email);
 }
-// function checkDate(birthdate) {
-//   // La méthode Date.now() renvoie le nombre de millisecondes écoulées depuis le 1er Janvier 1970
-//   let now = Date.now();
-//   // On récupère la valeur de l'input date ici
-//   let date = new Date(birthdate);
-//   let ONE_YEAR_IN_MILLISECONDS = 315360000000000;
-//   let age = (now - date) / ONE_YEAR_IN_MILLISECONDS;
-//   let minimumAge = 13;
-//   if (!(date instanceof Date) || isNaN(date)) {
-//     return false;
-//   }
-//   return age >= minimumAge;
-//   // Ne pas oublier de créer une variable miminimum age
-// }
+// Function qui vérifie la date de naissance
 function checkDate(birthdate) {
   let ageMinimum = 18;
   let oneYearInMilliseconds = 31557600000;
+  // Date actuelle en millisecondes
   let now = new Date();
+  // Date anniversaire en millisecondes
   let age = new Date(birthdate);
+  // La date actuelle en millisecondes - la date d'anniversaire en millisecondes divisé par une année en milliseconde afin de recevoir un age en année
   let difference = (now - age) / oneYearInMilliseconds;
-  console.log("difference", difference)
-  console.log("age", age);
-  console.log("now1", now.getTime());
-  console.log("now", now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+  let birthDate = document.querySelector("#birthdate");
+  // Si l'âge de l'utilisateur est inférieur à l'âge minimum, retourne un message d'erreur + false
   if (difference < ageMinimum) {
-    return false
+    displayMessage(birthDate, "Vous devez avoir + de 18 ans")
+    return false;
   }
-  return age >= ageMinimum;
+  // Si l'âge de l'utilisateur est supérieur à l'âge minimum, retourne true
+  if (difference >= ageMinimum) {
+    return true;
+  }
 }
-console.log(checkDate())
 // Function qui vérifie qu'une valeur numérique est saisie
 function checkNumber(number) {
+  // Si number n'est pas nombre, retourne false (IsNaN Retourne true si l'argument n'est pas un nombre)
   if (isNaN(number)) {
     return false
+    // Si number est supérieur à 100 ou que number est vide, retourne false
   } else if (number > 100 || number == "") {
     return false
   }
@@ -87,73 +99,49 @@ function checkNumber(number) {
 function checkBtnRadio(btnRadio) {
   // J'utilise une boucle for qui va itérer mes boutons radio et me retourner true si un des boutons est cochés 
   for (let i = 0; i < btnRadio.length; i++) {
+    // Si btnRadio a pour name "location" et que btnRadio est coché, alors retourne true
     if (btnRadio[i].name === "location" && btnRadio[i].checked) {
       return true
     }
   }
+  // Si btnRadio est coché, alors retourne true
   if (btnRadio.checked == true) {
     return true
   }
 }
-// Function qui affiche une erreur
-function displayMessage(element, message) {
-  let msg = document.createElement('p');
-  msg.style.color = "red";
-  msg.style.fontSize = "15px";
-  msg.classList.add('error_msg');
-  msg.innerHTML = message;
-  element.after(msg);
-}
-// 
 // function qui efface les erreurs
 function resetErrors() {
+  // Je récupère tous les éléments ayant pour class .error_msg
   let errors = document.querySelectorAll('.error_msg')
-  // forEach me permet d'executer la fonction remove() sur tous les éléments du tableau contenue dans la variable errors
+  // forEach me permet d'executer la fonction remove() sur tous les éléments du tableau contenue dans la variable errors (La méthode forEach() permet d'exécuter une fonction donnée sur chaque élément du tableau.)
   errors.forEach(element => element.remove());
 }
-function validate(element, message) {
-  displayMessage(element, message)
-};
+// Function qui permet d'afficher le message de confirmation d'envoi du formulaire
 function noneModal() {
-  modalbg.style.display = "none";
-  let div = document.createElement("div")
-  div.style.display = "block";
-  div.style.position = "fixed";
-  div.style.left = "370px";
-  div.style.right = "0";
-  div.style.zIndex = "3"
-  div.style.width = "500px";
-  div.style.height = "auto";
-  div.style.margin = "15px auto";
-  div.style.padding = "10px";
-  div.style.borderRadius = "10px";
-  div.style.backgroundColor = "#fe142f";
-  div.classList.add("form_msg");
-  div.innerHTML = "Merci ! Votre demande de réservation a bien été envoyée.";
-  div.style.color = "white";
-  div.style.fontSize = "18px";
-  div.style.textAlign = "center";
-  document.querySelector(".hero-section").before(div);
+  let modalBody = document.querySelector(".modal-body");
+  // .innerHTML = "" me permet de vider le modal de tous ses éléments
+  modalBody.innerHTML = "";
+  let p = document.createElement("p")
+  p.classList.add("form_msg");
+  p.innerHTML = "Merci ! Votre demande de réservation a bien été envoyée.";
+  p.style.color = "white";
+  p.style.fontSize = "18px";
+  p.style.textAlign = "center";
+  document.querySelector(".modal-body").before(p);
+  // La méthode setTimeout me permet de définir un minuteur qui exécutera le codé donné
   setTimeout(() => {
+    // La méthode location.reload permet de recharger la page depuis son URL actuelle
     location.reload();
-  }, 3000);
-
-
-  // let msg = document.createElement('p');
-  // msg.style.color = "red";
-  // msg.style.fontSize = "15px";
-  // msg.classList.add('error_msg');
-  // msg.innerHTML = message;
-  // element.after(msg);
+  }, 5000);
 }
-
-
 // Event
-// Je récupère via une variable mon élément ".close" et y ajoute l'événement "click" qui applique la fonction "closeModal"
+// Je récupère via une variable mon élément ".close" et y ajoute l'événement "click" qui applique une fonction anonyme
 closeForm.addEventListener('click', function () {
   closeModal();
 });
+// // Je récupère via une variable mon élément ".btnSubmit" et y ajoute l'événement "click" qui applique une fonction anonyme
 btnSubmit.addEventListener('click', function (e) {
+  // Je récupère mes éléments
   let firstName = document.querySelector("#first");
   let lastName = document.querySelector("#last");
   let email = document.querySelector("#email");
@@ -168,56 +156,51 @@ btnSubmit.addEventListener('click', function (e) {
   let validEmail = email.value;
   let validBirthDate = birthDate.value;
   let validQuantity = quantity.value;
+  // La méthode .preventDefault permet d'annuler l'effet par défaut d'un événement
   e.preventDefault();
+  // Application de la fonction permettant d'effacer les erreurs
   resetErrors();
   // vérifie que la case condition d'utilisation est cochée
   if (checkBtnRadio(generalCondition)) {
-    console.log("Conditions générales OK");
   } else {
     displayMessage(containerCondition, "⇧ Veuillez cocher les conditions générales");
-    console.log("Veuillez cocher les conditions générales");
   }
-  // vérifie qu'une ville est bien séléctionné
+  // Vérifie qu'une ville est bien séléctionné
   if (checkBtnRadio(location)) {
-    console.log("Ville renseignée OK");
   } else {
     displayMessage(containerLocation, "⇧ Veuillez renseigner une ville");
-    console.log("Veuillez renseigner une ville");
   }
+  // Vérifie qu'un nombre de tournois est indiqués
   if (checkNumber(validQuantity)) {
     console.log("Nombre de tournois participés OK !");
   } else {
     displayMessage(quantity, "⇧ Veuillez renseigner un nombre de tournois participés valide");
-    console.log("Veuillez renseigner un nombre de tournois participés valide");
   }
+  // Vérifie qu'une date de naissance est renseignée
   if (checkDate(validBirthDate)) {
-    console.log("Date de naissance OK !");
-  } else {
-    displayMessage(birthDate, "⇧ Veuillez renseigner une date de naissance valide")
-    console.log("Veuillez renseigner une date de naissance valide");
   }
+  if (validBirthDate == "") {
+    displayMessage(birthDate, "⇧ Veuillez renseigner une date de naissance valide");
+  }
+  // Vérifie qu'une adresse email est renseignée
   if (checkEmail(validEmail)) {
-    console.log("Email OK !");
   } else {
     displayMessage(email, "⇧ Veuillez renseigner une adresse Email valide");
-    console.log("Veuillez renseigner une adresse Email valide");
   }
+  // Vérifie qu'un nom de famille est renseigné
   if (checkName(validLastName)) {
-    console.log("Nom OK !");
   } else {
-    displayMessage(lastName, "⇧ Veuillez renseigner Nom avec un minimum de deux lettres (pas de chiffres)");
-    console.log("Veuillez renseigner Nom avec un minimum de deux lettres (pas de chiffres)");
+    displayMessage(lastName, "⇧ Veuillez renseigner Nom avec un minimum de deux lettres");
   }
+  // Vérifié qu'un prénom est renseigné
   if (checkName(validFirstName)) {
-    console.log("Prénom OK !");
   } else {
-    displayMessage(firstName, "⇧ Veuillez renseigner Prénom avec un minimum de deux lettres (pas de chiffres)");
-    console.log("Veuillez renseigner Prénom avec un minimum de deux lettres (pas de chiffres)");
+    displayMessage(firstName, "⇧ Veuillez renseigner Prénom avec un minimum de deux lettres");
   }
+  // Si les conditions précédentes renvois true, alors le formulaire est envoyé
   if (checkName(validFirstName) && checkName(validLastName) && checkEmail(validEmail) && checkDate(validBirthDate) && checkNumber(validQuantity) && checkBtnRadio(location) && checkBtnRadio(generalCondition)) {
     validate(containerCondition, "Merci ! Votre réservation a été reçue.");
+    // affiche le message de confirmation d'envois du formulaire et recharge la page
     noneModal();
-  } else {
-    console.log("Vous n'avez pas remplis toutes les informations");
   }
 });
